@@ -1,0 +1,369 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acta Imperium - Redazione Statale</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0c10;
+            color: #c5c6c7;
+            background-image: radial-gradient(circle at 50% 50%, #1f2833 0%, #0b0c10 100%);
+        }
+
+        h1, h2, h3, .serif-brand {
+            font-family: 'Cinzel', serif;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1f2833;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #4a5568;
+            border-radius: 10px;
+        }
+        
+        .acta-card {
+            background: #13151c;
+            border: 1px solid #2d3748;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-acta {
+            background: linear-gradient(135deg, #4a5568 0%, #1a202c 100%);
+            border: 1px solid #4a5568;
+            color: #ffffff;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+        .btn-acta:hover {
+            background: linear-gradient(135deg, #718096 0%, #2d3748 100%);
+            border-color: #a0aec0;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .input-acta {
+            background: #1a202c;
+            border: 1px solid #4a5568;
+            color: #ffffff;
+            transition: all 0.2s;
+            border-radius: 4px;
+        }
+        .input-acta:focus {
+            border-color: #a0aec0;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
+        }
+
+        .image-preview {
+            max-height: 180px;
+            object-fit: contain;
+            border: 2px solid #4a5568;
+            display: none;
+        }
+
+        .label-style {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #a0aec0;
+            margin-bottom: 0.25rem;
+            display: block;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-12 text-center border-b border-gray-800 pb-8">
+            <h1 class="text-5xl font-black text-white mb-2 tracking-widest">ACTA IMPERIUM</h1>
+            <p class="text-xs font-bold uppercase tracking-[0.6em] text-gray-500">Gazzetta Ufficiale e Registro dello Stato</p>
+        </header>
+
+        <!-- Area Parsing -->
+        <div class="acta-card p-6 mb-10 border-l-4 border-gray-400">
+            <h2 class="text-sm font-bold text-gray-300 uppercase tracking-widest flex items-center mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                Importazione Testo (Parsing)
+            </h2>
+            <textarea id="quickPaste" class="w-full h-20 p-4 text-sm input-acta mb-4 custom-scrollbar" placeholder="Incolla qui i tag standard (np:title, np:subtitle, np:content...)"></textarea>
+            <button onclick="parseContent()" class="px-8 py-2 btn-acta text-xs">Decodifica Dati</button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            <!-- COLONNA SINISTRA (Dati) -->
+            <div class="lg:col-span-5 space-y-8">
+                <div class="acta-card p-8">
+                    <h3 class="font-bold text-white mb-6 border-b border-gray-800 pb-2 text-xs uppercase tracking-widest">Dati Protocollo</h3>
+                    <div class="space-y-5">
+                        <div>
+                            <label class="label-style">Titolo Ufficiale (#)</label>
+                            <input type="text" id="title" class="w-full p-3 input-acta text-sm font-bold" placeholder="Titolo della gazzetta...">
+                        </div>
+                        <div>
+                            <label class="label-style">Sottotitolo (##)</label>
+                            <input type="text" id="subtitle" class="w-full p-3 input-acta italic text-sm" placeholder="Sottotitolo dell'atto...">
+                        </div>
+                        <div>
+                            <label class="label-style">Fonte Governativa (📄)</label>
+                            <input type="text" id="journalSource" class="w-full p-3 input-acta text-sm font-bold" value="Acta Imperium">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="label-style">Ufficio / Luogo (📍)</label>
+                                <input type="text" id="location" class="w-full p-3 input-acta text-sm" placeholder="Es. Senato Centrale">
+                            </div>
+                            <div>
+                                <label class="label-style">Hashtags</label>
+                                <input type="text" id="hashtags" class="w-full p-3 input-acta text-sm" placeholder="#Acta #Imperium">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timestamp -->
+                <div class="acta-card p-8 bg-[#181b24]">
+                    <h3 class="label-style flex items-center text-white">
+                        <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Registro Cronologico (📆)
+                    </h3>
+                    <div class="flex gap-2 mt-4">
+                        <input type="datetime-local" id="tsDate" class="flex-grow p-3 input-acta text-xs">
+                        <select id="tsStyle" class="p-3 input-acta text-[10px] font-bold" onchange="updateTS()">
+                            <option value="f" selected>Standard</option>
+                            <option value="R">Relativo</option>
+                        </select>
+                    </div>
+                    <div id="tsPreview" class="mt-2 text-[10px] font-mono text-center text-gray-400 bg-black/40 p-2 border border-gray-800 rounded"></div>
+                </div>
+
+                <div class="acta-card p-8">
+                    <h3 class="label-style text-white mb-4">Firmatori & Dipartimenti</h3>
+                    <div id="authorsList" class="space-y-2 mb-4"></div>
+                    <div id="topicsList" class="grid grid-cols-2 gap-2"></div>
+                </div>
+            </div>
+
+            <!-- COLONNA DESTRA (Contenuto) -->
+            <div class="lg:col-span-7 space-y-8">
+                <div class="acta-card p-8 flex flex-col min-h-[480px]">
+                    <h3 class="label-style text-white">Dichiarazione / Corpo Testo (Embed 1)</h3>
+                    <textarea id="content" class="flex-grow w-full p-5 input-acta text-sm custom-scrollbar bg-black/20" placeholder="Inserisci il testo legale o l'articolo..."></textarea>
+                </div>
+
+                <div class="acta-card p-8">
+                    <h3 class="label-style text-white">Clausola Legale</h3>
+                    <textarea id="copyright" class="w-full p-3 text-[10px] input-acta h-16 bg-black/20">Acta Imperium © 2026 - 2027 - All Rights Reserved - Questo articolo è stato pubblicato originariamente dall'Acta Imperium, la distorsione di esso e una diffamazione su esso comporterebbe il rischio di azioni legali</textarea>
+                </div>
+
+                <div class="acta-card p-8">
+                    <h3 class="label-style text-white">Prove Media & Archivi visivi</h3>
+                    <div class="flex gap-6 mb-4 text-[11px] font-bold">
+                        <label class="cursor-pointer"><input type="radio" name="imgMethod" value="url" checked onchange="toggleImgInput()" class="mr-1"> URL IMMAGINE</label>
+                        <label class="cursor-pointer"><input type="radio" name="imgMethod" value="file" onchange="toggleImgInput()" class="mr-1"> FILE LOCALE</label>
+                    </div>
+                    <div id="urlInputContainer"><input type="text" id="imageUrl" oninput="updatePreview()" class="w-full p-3 input-acta text-xs" placeholder="https://..."></div>
+                    <div id="fileInputContainer" class="hidden"><input type="file" id="imageFile" onchange="updatePreview()" class="text-xs text-gray-400"></div>
+                    <div class="mt-4 p-4 border border-gray-800 rounded flex justify-center bg-black/30">
+                        <img id="imagePreview" src="#" class="image-preview">
+                        <span id="previewPlaceholder" class="text-[10px] text-gray-600 font-bold uppercase tracking-wider">Nessun file associato</span>
+                    </div>
+                </div>
+
+                <button onclick="publish()" id="sendBtn" class="w-full py-6 btn-acta text-xl active:scale-[0.98] transition shadow-2xl flex items-center justify-center">
+                    <span id="btnText">REGISTRA & PUBBLICA</span>
+                    <span id="btnLoader" class="hidden ml-4 animate-spin">
+                        <svg class="w-6 h-6 text-white" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    </span>
+                </button>
+                <div id="statusMessage" class="hidden p-4 rounded text-center font-bold text-xs uppercase border mt-4 animate-pulse"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const WEB_MAIN = "https://discord.com/api/webhooks/1520205921085689969/plV96UQ7iqCOJTd-xVzSBUs4dTb39Nuj6hU79BMTSLaOg_TR4ARfqMIwXaY6wRdsixwU";
+        const WEB_ARCH = "https://discord.com/api/webhooks/1484830827530424372/0gDHgt_APA3ptlXn6t6WyTEr2i7KiMNsrtMB-Cvf655-5fOC2ckkiC2QIWNRH98Q_fBe";
+
+        // Autori richiesti aggiornati
+        const AUTHORS = ["gaga073637", "TweeBubbles9027", "Mhenz"];
+        const TOPICS = ["Decreti", "Notizie di Stato", "Esteri", "Interni", "Riforme", "Militare", "Giustizia"];
+        const CHARCOAL_COLOR = 3422784; 
+        const ROLE_ID = "1133318954841014362";
+
+        window.onload = () => {
+            const authDiv = document.getElementById('authorsList');
+            AUTHORS.forEach(a => authDiv.innerHTML += `
+                <label class="flex items-center space-x-2 p-2 bg-[#1a202c]/50 border border-gray-800 rounded text-[11px] font-bold text-gray-300 cursor-pointer hover:bg-gray-800/50 transition">
+                    <input type="checkbox" name="author" value="${a}" class="rounded bg-black border-gray-700 text-gray-500 focus:ring-0"> 
+                    <span>${a}</span>
+                </label>
+            `);
+            
+            const topDiv = document.getElementById('topicsList');
+            TOPICS.forEach(t => topDiv.innerHTML += `
+                <label class="flex items-center space-x-2 p-2 bg-black/40 border border-gray-900 rounded text-[10px] font-bold text-gray-500 cursor-pointer hover:bg-gray-800/30 transition">
+                    <input type="checkbox" name="topic" value="${t}" class="rounded bg-black border-gray-800 text-gray-500 focus:ring-0"> 
+                    <span>${t}</span>
+                </label>
+            `);
+            
+            const n = new Date(); n.setMinutes(n.getMinutes() - n.getTimezoneOffset());
+            document.getElementById('tsDate').value = n.toISOString().slice(0, 16);
+            setInterval(updateTS, 1000);
+        };
+
+        function updateTS() {
+            const d = document.getElementById('tsDate').value;
+            const s = document.getElementById('tsStyle').value;
+            if(!d) return;
+            const u = Math.floor(new Date(d).getTime() / 1000);
+            document.getElementById('tsPreview').innerText = `<t:${u}:${s}>`;
+        }
+
+        function toggleImgInput() {
+            const m = document.querySelector('input[name="imgMethod"]:checked').value;
+            document.getElementById('urlInputContainer').classList.toggle('hidden', m === 'file');
+            document.getElementById('fileInputContainer').classList.toggle('hidden', m === 'url');
+            resetImg();
+        }
+
+        function updatePreview() {
+            const m = document.querySelector('input[name="imgMethod"]:checked').value;
+            const img = document.getElementById('imagePreview');
+            const ph = document.getElementById('previewPlaceholder');
+            if(m === 'url') {
+                const u = document.getElementById('imageUrl').value;
+                if(u.startsWith('http')) { img.src = u; img.style.display = 'block'; ph.style.display = 'none'; }
+            } else {
+                const f = document.getElementById('imageFile').files[0];
+                if(f) { const r = new FileReader(); r.onload = e => { img.src = e.target.result; img.style.display = 'block'; ph.style.display = 'none'; }; r.readAsDataURL(f); }
+            }
+        }
+
+        function resetImg() {
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('previewPlaceholder').style.display = 'block';
+            document.getElementById('imageUrl').value = '';
+            document.getElementById('imageFile').value = '';
+        }
+
+        function parseContent() {
+            const r = document.getElementById('quickPaste').value;
+            const p = { 
+                title: /np:title\s+([\s\S]*?)(?=\s*np:|$)/i, 
+                subtitle: /np:subtitle\s+([\s\S]*?)(?=\s*np:|$)/i, 
+                hashtags: /np:hashtags\s+([\s\S]*?)(?=\s*np:|$)/i, 
+                content: /np:content\s+([\s\S]*?)(?=\s*np:|$)/i 
+            };
+            Object.entries(p).forEach(([k, v]) => { 
+                const m = r.match(v); 
+                if(m) document.getElementById(k).value = m[1].trim(); 
+            });
+            showMessage("Analisi testo completata con successo", "success");
+        }
+
+        async function publish() {
+            const t = document.getElementById('title').value;
+            const st = document.getElementById('subtitle').value;
+            const c = document.getElementById('content').value;
+            const h = document.getElementById('hashtags').value;
+            const l = document.getElementById('location').value;
+            const s = document.getElementById('journalSource').value;
+            const ts = document.getElementById('tsPreview').innerText;
+            const auths = Array.from(document.querySelectorAll('input[name="author"]:checked')).map(x => x.value);
+            const tops = Array.from(document.querySelectorAll('input[name="topic"]:checked')).map(x => x.value);
+            const cp = document.getElementById('copyright').value;
+
+            if(!t || !c) return showMessage("Titolo e Contenuto sono obbligatori per l'emissione", "error");
+            
+            setLoading(true);
+
+            // COMPOSIZIONE MESSAGGIO DISCORD (STILE GOTHIC/IMPERIALE)
+            let msg = `# ${t}\n`;
+            if(st) msg += `## *${st}*\n`;
+            msg += `\n-# ${cp}\n`;
+            if(h) msg += `${h}\n`;
+            msg += `>>> 📆 **Data** - ${ts}\n`;
+            msg += `📍 **Luogo** - ${l || 'Istituzioni Centrali'}\n`;
+            msg += `🏷️ **Sezione** - ${tops.join(", ") || 'Decreti'}\n`;
+            msg += `📄 **Fonte Giornalistica** - ${s}\n`;
+            msg += `📢 **Menzioni** - <@&${ROLE_ID}>\n`;
+
+            const embeds = [
+                { description: c, color: CHARCOAL_COLOR }
+            ];
+
+            try {
+                const fd = new FormData();
+                const method = document.querySelector('input[name="imgMethod"]:checked').value;
+                const file = document.getElementById('imageFile').files[0];
+                const url = document.getElementById('imageUrl').value;
+
+                // Gestione Media (Embed 2)
+                if(method === 'file' && file) {
+                    embeds.push({ image: { url: 'attachment://media.png' }, color: CHARCOAL_COLOR });
+                    fd.append('file', file, 'media.png');
+                } else if(url) {
+                    embeds.push({ image: { url: url }, color: CHARCOAL_COLOR });
+                }
+
+                // Embed Firma Registro
+                embeds.push({ 
+                    description: `*Questo Documento d'archivio è stato vidimato e redatto da* **${auths.join(", ") || 'Dipartimento Statale'}**`, 
+                    color: CHARCOAL_COLOR 
+                });
+
+                fd.append('payload_json', JSON.stringify({ content: msg, embeds }));
+
+                // Invio al Webhook Notizie di Stato (Acta Imperium)
+                const res1 = await fetch(WEB_MAIN, { method: 'POST', body: fd });
+
+                // Archivio di backup (.doc)
+                const docText = `REGISTRO DI STATO: ACTA IMPERIUM\n\nProtocollo: ${t}\nNote: ${st}\nFirmatari: ${auths.join(", ")}\n\nTesto:\n${c}\n\nCopyright: ${cp}`;
+                const afd = new FormData();
+                afd.append('payload_json', JSON.stringify({ content: `💾 **Protocollo Registrato**: \`${t}\`` }));
+                afd.append('file', new Blob([docText], {type:'text/plain'}), `Protocollo_${t.replace(/ /g,'_')}.doc`);
+                await fetch(WEB_ARCH, { method: 'POST', body: afd });
+
+                if(res1.ok) {
+                    showMessage("Documento registrato e diffuso con successo", "success");
+                } else {
+                    throw new Error();
+                }
+            } catch(e) { 
+                showMessage("Errore nell'invio del protocollo governativo", "error"); 
+            }
+            setLoading(false);
+        }
+
+        function setLoading(isLoading) {
+            const btn = document.getElementById('sendBtn');
+            btn.disabled = isLoading;
+            document.getElementById('btnLoader').classList.toggle('hidden', !isLoading);
+            document.getElementById('btnText').innerText = isLoading ? "Registrazione..." : "REGISTRA & PUBBLICA";
+        }
+
+        function showMessage(msg, type) {
+            const el = document.getElementById('statusMessage');
+            el.innerText = msg.toUpperCase();
+            el.className = `p-4 rounded text-center font-bold text-xs uppercase border mt-4 ${type === 'success' ? 'bg-[#181b24] text-[#66fcf1] border-sky-900' : 'bg-red-950 text-red-300 border-red-900'}`;
+            el.classList.remove('hidden');
+            setTimeout(() => el.classList.add('hidden'), 5000);
+        }
+    </script>
+</body>
+</html>
